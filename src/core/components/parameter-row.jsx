@@ -93,6 +93,27 @@ export default class ParameterRow extends Component {
     return specActions.updateEmptyParamInclusion(pathMethod, paramName, paramIn, newValue)
   }
 
+  handleKeyDown = (e) => {
+    if (!this.props.isExecute) {
+      return
+    }
+
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+
+      // TODO - account for functions that have no parameters - create a seamless user experience
+      const opblockBody = e.target.closest('.opblock-body')
+      const executeButton = opblockBody.getElementsByClassName('btn execute')[0]
+      if (executeButton && !executeButton.disabled) {
+        window.scrollTo({
+          top: executeButton.getBoundingClientRect().top + window.scrollY - 200,
+          behavior: 'smooth'
+        })
+        executeButton.click()
+      }
+    }
+  };
+
   setDefaultValue = () => {
     let { specSelectors, pathMethod, rawParam, oas3Selectors, fn } = this.props
 
@@ -282,7 +303,7 @@ export default class ParameterRow extends Component {
     }
 
     return (
-      <tr data-param-name={param.get("name")} data-param-in={param.get("in")}>
+      <tr data-param-name={param.get("name")} data-param-in={param.get("in")} onKeyDown={this.handleKeyDown}>
         <td className="parameters-col_name">
           <div className={required ? "parameter__name required" : "parameter__name"}>
             { param.get("name") }
