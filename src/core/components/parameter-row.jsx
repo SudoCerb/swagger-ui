@@ -198,8 +198,7 @@ export default class ParameterRow extends Component {
     
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault()
-      alert("parameter-row")
-      // return
+      console.log("parameter-row CTRL+Enter")
 
       // TODO - account for functions that have no parameters - create a seamless user experience
       const opblockBody = e.target.closest('.opblock-body')
