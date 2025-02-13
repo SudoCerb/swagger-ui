@@ -92,10 +92,17 @@ export default class Execute extends Component {
 
   onChangeProducesWrapper = ( val ) => this.props.specActions.changeProducesValue([this.props.path, this.props.method], val)
 
+  handleKeyDown = (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      e.target.click()
+    }
+  }
+  
   render(){
     const { disabled } = this.props
     return (
-        <button className="btn execute opblock-control__btn" onClick={ this.onClick } disabled={disabled}>
+        <button className="btn execute opblock-control__btn" onClick={ this.onClick } disabled={disabled} onKeyDown={this.handleKeyDown}>
           Execute
         </button>
     )
