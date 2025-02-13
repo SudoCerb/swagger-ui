@@ -43,6 +43,32 @@ export default class Operation extends PureComponent {
     summary: ""
   }
 
+  handleOpblockBodyKeyDown = (e) => {
+    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (e.ctrlKey || e.metaKey)) {
+      // NOTE this is a broad scooe - maybe too broad, implemented so that a user could quickly get to the opblock-operation-summary component, which then had its own handler to allow the user to quickly navigate between operations. This is how it has been implemented now. If there are more complex pages with lots of documentation and possible responses MAYBE we will re-look at this, but since they aren't highlightable components we won't bother now
+      e.preventDefault()
+      const opblock = e.target.closest('.opblock')
+      if (e.key === 'ArrowUp') {
+        const summaryControl = opblock.getElementsByClassName('opblock-summary-control')
+        if (summaryControl && summaryControl[0]) {
+          summaryControl[0].focus()
+        }
+      } else {
+        console.log("ARROWDOWN - Getting next operation or tag section")
+        const thisSpan = opblock.closest('span')
+        const nextSpan = thisSpan.nextSibling
+        if (nextSpan) {
+          const nextControl = nextSpan.getElementsByClassName('opblock-summary-control')[0]
+          nextControl.focus()
+          nextControl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        } else {
+          const nextTagSpan = 2 // TODO continue from here
+        }
+
+      }
+    }
+  }
+
   render() {
     let {
       specPath,
@@ -121,7 +147,7 @@ export default class Operation extends PureComponent {
         <div className={deprecated ? "opblock opblock-deprecated" : isShown ? `opblock opblock-${method} is-open` : `opblock opblock-${method}`} id={escapeDeepLinkPath(isShownKey.join("-"))} >
           <OperationSummary operationProps={operationProps} isShown={isShown} toggleShown={toggleShown} getComponent={getComponent} authActions={authActions} authSelectors={authSelectors} specPath={specPath} />
           <Collapse isOpened={isShown}>
-            <div className="opblock-body">
+            <div className="opblock-body" onKeyDown={this.handleOpblockBodyKeyDown} >
               { (operation && operation.size) || operation === null ? null :
                 <RollingLoadSVG height="32px" width="32px" className="opblock-loading-animation" />
               }
