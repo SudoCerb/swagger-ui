@@ -24,6 +24,138 @@ export default class OperationSummary extends PureComponent {
     summary: ""
   }
 
+  handleKeyDown = (e) => {
+//     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+//       e.preventDefault()
+// 
+//       const opblock = e.target.closest("opblock is-open")
+//       this.props.toggleShown()
+//       // if (this.props.isShown) {
+  //       //   alert("THEORETICALLY SHOWN")
+  //       //   alert(this.props.isShown)
+  //       // } else {
+    //       //   // execute things
+    //       //   alert("Is now closed")
+    //       //   alert(this.props.isShown)
+    //       //   // get the try it out button
+    //       // }
+    //         
+    // 
+    //         const tryOutBtn = opblock.getElementsByClassName("btn try-out__btn")[0]
+    //         if (tryOutBtn && !tryOutBtn.disabled) {
+      //           alert("Got the button")
+      //         }
+      //       }
+      if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault()
+        if (e.key === 'ArrowUp') {
+          console.log("arr up operation-summary")
+          const focused = e.target
+          const targetSpan = focused.closest("span")
+          const prevSpan = targetSpan.previousSibling
+          if (prevSpan) {
+            const prevOperation = prevSpan.getElementsByClassName('opblock-summary-control')[0]
+            prevOperation.focus()
+            prevOperation.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          } else {
+            const tagSection = targetSpan.closest('.opblock-tag-section')
+            const targetTagSpan = tagSection.closest('span')
+            const prevTagSpan = targetTagSpan.previousSibling
+            if (prevTagSpan) {
+              // TODO abstract this away so that CTRL + LeftArrow and CTRL + RightArrow can be used to quickly move between tag spans
+              const prevTagSectionArrow = prevTagSpan.getElementsByClassName('expand-operation')[0]
+              prevTagSectionArrow.focus()
+              prevTagSectionArrow.click()
+              
+              // const simulateTab = () => {
+              //   const event = new KeyboardEvent('keydown', {
+              //     key: 'Tab',
+              //     code: 'Tab',
+              //     keyCode: 9,
+              //     which: 9,
+              //     bubbles: true,
+              //     cancelable: true
+              //   });
+              //   document.dispatchEvent(event);
+              // };
+              // simulateTab()
+
+              // const simulateTabNextFrame = () => {
+              //   requestAnimationFrame(() => {
+              //     const tabEvent = new KeyboardEvent('keydown', {
+              //       key: 'Tab',
+              //       code: 'Tab',
+              //       keyCode: 9,
+              //       which: 9,
+              //       bubbles: true,
+              //       cancelable: true,
+              //       shiftKey: false
+              //     });
+              //     document.dispatchEvent(tabEvent);
+              //   });
+              // };
+              // simulateTabNextFrame();
+              // simulateTabNextFrame();
+              // simulateTabNextFrame();
+
+              const selectNextOp = () => {
+                const maxAttempts = 10;
+                let attempts = 0;
+                
+                const trySelectNextOp = () => {
+                  if (attempts >= maxAttempts) {
+                    console.log('Max attempts reached - target elements not found');
+                    return;
+                  }
+                  
+                  const targetElements = prevTagSpan.getElementsByClassName('opblock-summary-control');
+                  
+                  if (targetElements.length === 0) {
+                    // Elements not found yet, retry
+                    attempts++;
+                    setTimeout(trySelectNextOp, 100);
+                    return;
+                  }
+              
+                  try {
+                    // Find the first element after the currently focused one
+                    const elementsArray = Array.from(targetElements);
+                    const currentFocusIndex = elementsArray.indexOf(document.activeElement);
+                    const nextElement = elementsArray[currentFocusIndex + 1] || elementsArray[0];
+                    
+                    if (nextElement) {
+                      nextElement.focus();
+                    }
+                  } catch (error) {
+                    console.log('Error focusing element:', error);
+                    attempts++;
+                    setTimeout(trySelectNextOp, 100);
+                  }
+                };
+              
+                trySelectNextOp();
+              };
+              selectNextOp();
+              console.log("HEHEE")
+
+
+              // const firstOp = prevSpan.getElementsByClassName('opblock-summary-control')[0]
+              // firstOp.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              // firstOp.focus()
+              // prevTagSpan.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            } else {
+              return
+            }
+          }
+
+          
+          
+        } else {
+          console.log("arr down operation-summary")
+      }
+    }
+  };
+
   render() {
 
     let {
@@ -71,6 +203,7 @@ export default class OperationSummary extends PureComponent {
           aria-expanded={isShown}
           className="opblock-summary-control"
           onClick={toggleShown}
+          onKeyDown={this.handleKeyDown}
         >
           <OperationSummaryMethod method={method} />
           <div className="opblock-summary-path-description-wrapper">
