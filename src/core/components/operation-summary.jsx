@@ -25,31 +25,9 @@ export default class OperationSummary extends PureComponent {
   }
 
   handleKeyDown = (e) => {
-//     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-//       e.preventDefault()
-// 
-//       const opblock = e.target.closest("opblock is-open")
-//       this.props.toggleShown()
-//       // if (this.props.isShown) {
-  //       //   alert("THEORETICALLY SHOWN")
-  //       //   alert(this.props.isShown)
-  //       // } else {
-    //       //   // execute things
-    //       //   alert("Is now closed")
-    //       //   alert(this.props.isShown)
-    //       //   // get the try it out button
-    //       // }
-    //         
-    // 
-    //         const tryOutBtn = opblock.getElementsByClassName("btn try-out__btn")[0]
-    //         if (tryOutBtn && !tryOutBtn.disabled) {
-      //           alert("Got the button")
-      //         }
-      //       }
       if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
         if (e.key === 'ArrowUp') {
-          console.log("arr up operation-summary")
           const focused = e.target
           const targetSpan = focused.closest("span")
           const prevSpan = targetSpan.previousSibling
@@ -65,39 +43,17 @@ export default class OperationSummary extends PureComponent {
               // TODO abstract this away so that CTRL + LeftArrow and CTRL + RightArrow can be used to quickly move between tag spans
               const prevTagSectionArrow = prevTagSpan.getElementsByClassName('expand-operation')[0]
               prevTagSectionArrow.focus()
-              prevTagSectionArrow.click()
+              const checkOpenSection = prevTagSpan.closest('.opblock-tag-section.is-open')
+              let isOpenSection
+              // FIXME janky AF
+              // TODO replace with ternary statement
+              if (checkOpenSection) {
+                isOpenSection = true
+              } else {
+                isOpenSection = false
+              }
+              !isOpenSection ? prevTagSectionArrow.click() : null
               
-              // const simulateTab = () => {
-              //   const event = new KeyboardEvent('keydown', {
-              //     key: 'Tab',
-              //     code: 'Tab',
-              //     keyCode: 9,
-              //     which: 9,
-              //     bubbles: true,
-              //     cancelable: true
-              //   });
-              //   document.dispatchEvent(event);
-              // };
-              // simulateTab()
-
-              // const simulateTabNextFrame = () => {
-              //   requestAnimationFrame(() => {
-              //     const tabEvent = new KeyboardEvent('keydown', {
-              //       key: 'Tab',
-              //       code: 'Tab',
-              //       keyCode: 9,
-              //       which: 9,
-              //       bubbles: true,
-              //       cancelable: true,
-              //       shiftKey: false
-              //     });
-              //     document.dispatchEvent(tabEvent);
-              //   });
-              // };
-              // simulateTabNextFrame();
-              // simulateTabNextFrame();
-              // simulateTabNextFrame();
-
               const selectNextOp = () => {
                 const maxAttempts = 10;
                 let attempts = 0;
