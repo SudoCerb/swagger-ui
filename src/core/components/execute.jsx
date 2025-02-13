@@ -93,9 +93,11 @@ export default class Execute extends Component {
   onChangeProducesWrapper = ( val ) => this.props.specActions.changeProducesValue([this.props.path, this.props.method], val)
 
   handleKeyDown = (e) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !this.disabled ) {
       e.preventDefault()
-      e.target.click()
+      if (!this.disabled) {
+        e.target.click()
+      }
     }
   }
   
