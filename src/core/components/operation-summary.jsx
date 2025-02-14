@@ -42,63 +42,54 @@ export default class OperationSummary extends PureComponent {
             if (prevTagSpan) {
               // TODO abstract this away so that CTRL + LeftArrow and CTRL + RightArrow can be used to quickly move between tag spans
               const prevTagSectionArrow = prevTagSpan.getElementsByClassName('expand-operation')[0]
-              prevTagSectionArrow.focus()
-              const checkOpenSection = prevTagSpan.closest('.opblock-tag-section.is-open')
-              let isOpenSection
-              // FIXME janky AF
-              // TODO replace with ternary statement
-              if (checkOpenSection) {
-                isOpenSection = true
+              const isOpen = prevTagSectionArrow.ariaExpanded === 'true'
+              if (isOpen) {
+                console.log("prev tag section open")
+                const prevTagOps = prevTagSpan.getElementsByClassName('opblock-summary-control')
+                const lastOp = prevTagOps[prevTagOps.length - 1]
+                lastOp.focus()
+                lastOp.scrollIntoView({ behavior: 'smooth', block: 'center'})
               } else {
-                isOpenSection = false
-              }
-              !isOpenSection ? prevTagSectionArrow.click() : null
-              
-              const selectNextOp = () => {
-                const maxAttempts = 10;
-                let attempts = 0;
-                
-                const trySelectNextOp = () => {
-                  if (attempts >= maxAttempts) {
-                    console.log('Max attempts reached - target elements not found');
-                    return;
-                  }
+                // prevTagSectionArrow.focus()  // might not be needed
+                prevTagSectionArrow.click()
+                const selectNextOp = () => {
+                  const maxAttempts = 10;
+                  let attempts = 0;
                   
-                  const targetElements = prevTagSpan.getElementsByClassName('opblock-summary-control');
-                  
-                  if (targetElements.length === 0) {
-                    // Elements not found yet, retry
-                    attempts++;
-                    setTimeout(trySelectNextOp, 100);
-                    return;
-                  }
-              
-                  try {
-                    // Find the first element after the currently focused one
-                    const elementsArray = Array.from(targetElements);
-                    const currentFocusIndex = elementsArray.indexOf(document.activeElement);
-                    const nextElement = elementsArray[currentFocusIndex + 1] || elementsArray[0];
-                    
-                    if (nextElement) {
-                      nextElement.focus();
+                  const trySelectNextOp = () => {
+                    if (attempts >= maxAttempts) {
+                      console.log('Max attempts reached - target elements not found');
+                      return;
                     }
-                  } catch (error) {
-                    console.log('Error focusing element:', error);
-                    attempts++;
-                    setTimeout(trySelectNextOp, 100);
-                  }
+                    
+                    const targetElements = prevTagSpan.getElementsByClassName('opblock-summary-control');
+                    
+                    if (targetElements.length === 0) {
+                      // Elements not found yet, retry
+                      attempts++;
+                      setTimeout(trySelectNextOp, 100);
+                      return;
+                    }
+                
+                    try {
+                      // Find the first element after the currently focused one
+                      const elementsArray = Array.from(targetElements);
+                      const currentFocusIndex = elementsArray.indexOf(document.activeElement);
+                      const nextElement = elementsArray[currentFocusIndex + 1] || elementsArray[0];
+                      
+                      if (nextElement) {
+                        nextElement.focus();
+                      }
+                    } catch (error) {
+                      console.log('Error focusing element:', error);
+                      attempts++;
+                      setTimeout(trySelectNextOp, 100);
+                    }
+                  };
+                  trySelectNextOp();
                 };
-              
-                trySelectNextOp();
-              };
-              selectNextOp();
-              console.log("HEHEE")
-
-
-              // const firstOp = prevSpan.getElementsByClassName('opblock-summary-control')[0]
-              // firstOp.scrollIntoView({ behavior: 'smooth', block: 'center' })
-              // firstOp.focus()
-              // prevTagSpan.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                selectNextOp();
+              }
             } else {
               return
             }
