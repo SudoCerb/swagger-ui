@@ -52,11 +52,11 @@ export default class OperationSummary extends PureComponent {
               } else {
                 // prevTagSectionArrow.focus()  // might not be needed
                 prevTagSectionArrow.click()
-                const selectNextOp = () => {
+                const selectNextOp = (startPoint) => {
                   const maxAttempts = 10;
                   let attempts = 0;
                   
-                  const trySelectNextOp = () => {
+                  const trySelectNextOp = (startPoint) => {
                     if (attempts >= maxAttempts) {
                       console.log('Max attempts reached - target elements not found');
                       return;
@@ -75,7 +75,12 @@ export default class OperationSummary extends PureComponent {
                       // Find the first element after the currently focused one
                       const elementsArray = Array.from(targetElements);
                       const currentFocusIndex = elementsArray.indexOf(document.activeElement);
-                      const nextElement = elementsArray[currentFocusIndex + 1] || elementsArray[0];
+                      let nextElement
+                      if (startPoint === 'first') {
+                        nextElement = elementsArray[currentFocusIndex + 1] || elementsArray[0];
+                      } else {
+                        nextElement = elementsArray[elementsArray.length - 1];
+                      }
                       
                       if (nextElement) {
                         nextElement.focus();
@@ -86,9 +91,9 @@ export default class OperationSummary extends PureComponent {
                       setTimeout(trySelectNextOp, 100);
                     }
                   };
-                  trySelectNextOp();
+                  trySelectNextOp(startPoint);
                 };
-                selectNextOp();
+                selectNextOp('last');
               }
             } else {
               return
