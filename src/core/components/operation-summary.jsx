@@ -24,6 +24,48 @@ export default class OperationSummary extends PureComponent {
     summary: ""
   }
 
+  selectNextOp = (prevTagSpan, startPoint) => {
+    const maxAttempts = 10;
+    let attempts = 0;
+    
+    const trySelectNextOp = (prevTagSpan, startPoint) => {
+      if (attempts >= maxAttempts) {
+        console.log('Max attempts reached - target elements not found');
+        return;
+      }
+      
+      const targetElements = prevTagSpan.getElementsByClassName('opblock-summary-control');
+      
+      if (targetElements.length === 0) {
+        // Elements not found yet, retry
+        attempts++;
+        setTimeout(trySelectNextOp, 100);
+        return;
+      }
+  
+      try {
+        // Find the first element after the currently focused one
+        const elementsArray = Array.from(targetElements);
+        const currentFocusIndex = elementsArray.indexOf(document.activeElement);
+        let nextElement
+        if (startPoint === 'first') {
+          nextElement = elementsArray[currentFocusIndex + 1] || elementsArray[0];
+        } else {
+          nextElement = elementsArray[elementsArray.length - 1];
+        }
+        
+        if (nextElement) {
+          nextElement.focus();
+        }
+      } catch (error) {
+        console.log('Error focusing element:', error);
+        attempts++;
+        setTimeout(trySelectNextOp, 100);
+      }
+    };
+    trySelectNextOp(prevTagSpan, startPoint);
+  };
+
   handleKeyDown = (e) => {
       if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
@@ -52,48 +94,8 @@ export default class OperationSummary extends PureComponent {
               } else {
                 // prevTagSectionArrow.focus()  // might not be needed
                 prevTagSectionArrow.click()
-                const selectNextOp = (startPoint) => {
-                  const maxAttempts = 10;
-                  let attempts = 0;
-                  
-                  const trySelectNextOp = (startPoint) => {
-                    if (attempts >= maxAttempts) {
-                      console.log('Max attempts reached - target elements not found');
-                      return;
-                    }
-                    
-                    const targetElements = prevTagSpan.getElementsByClassName('opblock-summary-control');
-                    
-                    if (targetElements.length === 0) {
-                      // Elements not found yet, retry
-                      attempts++;
-                      setTimeout(trySelectNextOp, 100);
-                      return;
-                    }
-                
-                    try {
-                      // Find the first element after the currently focused one
-                      const elementsArray = Array.from(targetElements);
-                      const currentFocusIndex = elementsArray.indexOf(document.activeElement);
-                      let nextElement
-                      if (startPoint === 'first') {
-                        nextElement = elementsArray[currentFocusIndex + 1] || elementsArray[0];
-                      } else {
-                        nextElement = elementsArray[elementsArray.length - 1];
-                      }
-                      
-                      if (nextElement) {
-                        nextElement.focus();
-                      }
-                    } catch (error) {
-                      console.log('Error focusing element:', error);
-                      attempts++;
-                      setTimeout(trySelectNextOp, 100);
-                    }
-                  };
-                  trySelectNextOp(startPoint);
-                };
-                selectNextOp('last');
+
+                this.selectNextOp(prevTagSpan, 'last');
               }
             } else {
               return
