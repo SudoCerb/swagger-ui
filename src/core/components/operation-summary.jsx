@@ -27,30 +27,28 @@ export default class OperationSummary extends PureComponent {
   handleKeyDown = (e) => {
       if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
+        const focused = e.target
+        const targetSpan = focused.closest("span")
+        const tagSection = targetSpan.closest('.opblock-tag-section')
+        const targetTagSpan = tagSection.closest('span')
         if (e.key === 'ArrowUp') {
-          const focused = e.target
-          const targetSpan = focused.closest("span")
           const prevSpan = targetSpan.previousSibling
           if (prevSpan) {
             const prevOperation = prevSpan.getElementsByClassName('opblock-summary-control')[0]
             prevOperation.focus()
             prevOperation.scrollIntoView({ behavior: 'smooth', block: 'center' })
           } else {
-            const tagSection = targetSpan.closest('.opblock-tag-section')
-            const targetTagSpan = tagSection.closest('span')
             const prevTagSpan = targetTagSpan.previousSibling
             if (prevTagSpan) {
               // TODO abstract this away so that CTRL + LeftArrow and CTRL + RightArrow can be used to quickly move between tag spans
               const prevTagSectionArrow = prevTagSpan.getElementsByClassName('expand-operation')[0]
               const isOpen = prevTagSectionArrow.ariaExpanded === 'true'
               if (isOpen) {
-                console.log("prev tag section open")
                 const prevTagOps = prevTagSpan.getElementsByClassName('opblock-summary-control')
                 const lastOp = prevTagOps[prevTagOps.length - 1]
                 lastOp.focus()
                 lastOp.scrollIntoView({ behavior: 'smooth', block: 'center'})
               } else {
-                // prevTagSectionArrow.focus()  // might not be needed
                 prevTagSectionArrow.click()
                 const selectNextOp = (startPoint) => {
                   const maxAttempts = 10;
@@ -103,7 +101,66 @@ export default class OperationSummary extends PureComponent {
           
           
         } else {
-          console.log("arr down operation-summary")
+          const nextSpan = targetSpan.nextSibling
+          if (nextSpan) {
+            const nextOperation = nextSpan.getElementsByClassName('opblock-summary-control')[0]
+            nextOperation.focus()
+            nextOperation.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          } else {
+            const nextTagSpan = targetTagSpan.nextSibling
+            if (nextTagSpan) {
+              const nextTagSectionArrow = nextTagSpan.getElementsByClassName('expand-operation')[0]
+              const isOpen = nextTagSectionArrow.ariaExpanded === 'true'
+              if (isOpen) {
+                const nextTagOps = nextTagSpan.getElementsByClassName('opblock-summary-control')
+                const firstOp = nextTagOps[0]
+                if (firstOp) {
+                  firstOp.focus()
+                  firstOp.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }
+              } else {
+                nextTagSectionArrow.click()
+                const selectNextOp = (startPoint) => {
+                  const maxAttempts = 10;
+                  let attempts = 0;
+                  
+                  const trySelectNextOp = (startPoint) => {
+                    if (attempts >= maxAttempts) {
+                      console.log('Max attempts reached - target elements not found');
+                      return;
+                    }
+                    
+                    const targetElements = nextTagSpan.getElementsByClassName('opblock-summary-control');
+                    
+                    if (targetElements.length === 0) {
+                      // Elements not found yet, retry
+                      attempts++;
+                      setTimeout(trySelectNextOp, 100);
+                      return;
+                    }
+                
+                    try {
+                      // Find the first element after the currently focused one
+                      const elementsArray = Array.from(targetElements);
+                      const currentFocusIndex = elementsArray.indexOf(document.activeElement);
+                      const nextElement = elementsArray[currentFocusIndex + 1] || elementsArray[0];
+                      
+                      if (nextElement) {
+                        nextElement.focus();
+                        nextElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                      }
+                    } catch (error) {
+                      console.log('Error focusing element:', error);
+                      attempts++;
+                      setTimeout(trySelectNextOp, 100);
+                    }
+                  };
+                  trySelectNextOp(startPoint);
+                };
+                selectNextOp('first');
+              }
+            }
+          }
       }
     }
   };
